@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 const ACTIVE_CIRCLE_STYLES =
     "flex items-center justify-center w-5 h-5 rounded-full";
-export default function ThemeSwithcer() {
+export default function ThemeSwitcher() {
     const [theme, setTheme] = useState("light");
     const toggleTheme = (theme) => {
         if (!theme) {
@@ -20,7 +20,7 @@ export default function ThemeSwithcer() {
         toggleTheme(localTheme);
     }, []);
     return (
-        <div className="w-14 h-8 items-center justify-around rounded-full bg-[#1F2937] flex   dark:fill-gray-100   ">
+        <div className="w-14 h-8 items-center justify-around rounded-full bg-[#1F2937] flex   dark:bg-[#111827]   ">
             <button
                 onClick={() => toggleTheme("light")}
                 className={`cursor-pointer ${ACTIVE_CIRCLE_STYLES} ${theme === "light" ? "bg-white" : ""}`}
