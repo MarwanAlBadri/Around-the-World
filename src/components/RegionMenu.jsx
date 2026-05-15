@@ -1,23 +1,34 @@
 import Select from "react-select";
 const options = [
-  { value: "africa", label: "Africa" },
-  { value: "oceania", label: "Oceania" },
-  { value: "europe", label: "Europe" },
-  { value: "asia", label: "Asia" },
-  { value: "america", label: "America" },
+  { value: "all regions", label: "All regions" },
+  { value: "Africa", label: "Africa" },
+  { value: "Oceania", label: "Oceania" },
+  { value: "Europe", label: "Europe" },
+  { value: "Asia", label: "Asia" },
+  { value: "Americas", label: "America" },
 ];
-export default function RegionMenu() {
+export default function RegionMenu({ countriesList, filterCountriesList }) {
+  const handleRegionChange = (e) => {
+    const region = e.value;
+    const filteredCountries =
+      region === "all regions"
+        ? countriesList
+        : countriesList.filter((country) => country.region === region);
+    filterCountriesList(filteredCountries);
+  };
   return (
     <Select
+      onChange={handleRegionChange}
+      defaultValue={options[0]}
       options={options}
       classNames={{
         input: () => "dark:!text-gray-100 ",
-        singleValue: () => "dark:text-gray-100",
+        singleValue: () => "dark:!text-gray-100",
         control: () =>
-          "flex h-12 items-center justify-between gap-12 rounded-md !border-none pl-4 pr-2 shadow ",
+          "flex h-12 items-center justify-between gap-12 !rounded-md !border-none pl-4 pr-2 shadow dark:!bg-gray-800 ",
         indicatorSeparator: () => "hidden",
-        option: () => "hover:!text-gray-800",
-        menu: () => "bg-gray-100 dark:bg-gray-800 dark:text-gray-100 ",
+        option: () => "hover:!text-gray-800  ",
+        menu: () => "!bg-gray-100 dark:!bg-gray-800 dark:!text-gray-100 ",
       }}
     />
   );
