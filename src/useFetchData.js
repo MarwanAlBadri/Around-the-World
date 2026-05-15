@@ -24,7 +24,7 @@ export default function useFetchData(country) {
       })
       .catch(() => setIsError(true))
       .finally(() => setIsLoading(false));
-  }, []);
+  }, [country]);
 
   return {
     result,
