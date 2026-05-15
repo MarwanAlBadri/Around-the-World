@@ -1,6 +1,12 @@
-export default function SearchInput() {
+export default function SearchInput({ countriesList, filterCountriesList }) {
+  const onSubmitHandler = (e) => {
+    e.preventDefault();
+    const inputValue = e.target.elements.search.value;
+    const filteredCountries =!inputValue || inputValue === "" ?countriesList : countriesList.filter(country => country.name.official.toLowerCase().includes(inputValue.toLowerCase()))
+    filterCountriesList(filteredCountries);
+  };
   return (
-    <form className="relative flex-1">
+    <form className="relative flex-1" onSubmit={onSubmitHandler}>
       <div className="absolute top-5 left-8">
         <svg
           width="18"

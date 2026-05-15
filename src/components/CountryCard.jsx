@@ -1,6 +1,8 @@
+import { Link } from "react-router-dom";
+
 export default function CountryCard({name, population ,region , capital , flag }) {
   return (
-    <a href="#">
+    <Link to={name} >
       <div className="h-full rounded bg-gray-50 p-3 pb-9 shadow-md lg:w-66 dark:bg-gray-800">
         <img
           src={flag}
@@ -24,6 +26,6 @@ export default function CountryCard({name, population ,region , capital , flag }
           </p>
         </div>
       </div>
-    </a>
+    </Link>
   );
 }
