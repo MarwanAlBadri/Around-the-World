@@ -1,7 +1,8 @@
 export default function EmptySearch() {
   return (
-    <div className="col-span-4 mt-6 flex flex-col items-center text-center">
+    <div className="col-span-full mt-6 flex flex-col items-center text-center">
       <svg
+        className="h-auto max-w-full"
         width="416"
         height="344"
         viewBox="0 0 416 344"
@@ -76,7 +77,7 @@ export default function EmptySearch() {
       </svg>
       <h2 className="text-4xl">No Results Found</h2>
       <p className="font-light">
-        We canlt find the country you searched for ... Try to search for another
+        We can't find the country you searched for ... Try to search for another
         one
       </p>
     </div>

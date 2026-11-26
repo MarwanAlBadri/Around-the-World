@@ -18,18 +18,17 @@ and open a detail page for any country. Includes a light / dark theme.
 
 ## 🛠 Tech stack
 
-React 19 · Vite · Tailwind CSS v4 · React Router v7 · React Select · Static JSON data (lazy-loaded)
+React 19 · Vite · Tailwind CSS v4 · React Router v7 · React Select · Vercel Serverless Functions · REST Countries API v5
 
 ## 🧠 How the data is loaded
 
-The app used to call the [REST Countries](https://restcountries.com/) API, but its free v1–v4 endpoints were shut down
-and the new version requires a paid/registered API key. To keep the project **free, fast and reliable**, the data now ships with the app:
+The data comes from the [REST Countries](https://restcountries.com/) v5 API, which requires an API key.
+To keep the key out of the browser, the app calls its own route and the server calls REST Countries:
 
-- `src/data/countries.json` — 250 countries (names, native names, region, sub-region, capital, population, TLD, currencies, languages).
-  It is **lazy-loaded** with a dynamic `import()`, so it's split into its own chunk (~23 KB gzipped).
-- `public/flags/*.svg` — an SVG flag for every country, served as static files.
-
-No API key, no network dependency, no rate limits.
+- `GET /api/countries` returns all countries, and `GET /api/countries?name=egypt` returns one.
+- `api/countries.js` adds the key, requests only the fields the app uses and caches the result for 24 hours.
+- On Vercel it runs as a Serverless Function. During `npm run dev`, a small plugin in `vite.config.js` serves it.
+  `npm run preview` does not serve this route.
 
 ## 🚀 Getting started
 
@@ -37,22 +36,32 @@ No API key, no network dependency, no rate limits.
 git clone https://github.com/MarwanAlBadri/Around-the-World.git
 cd Around-the-World
 npm install
+```
+
+[Get an API key](https://restcountries.com/sign-up), then create a `.env.local` file in the project root
+(it is ignored by Git):
+
+```
+REST_COUNTRIES_API_KEY=your_api_key
+```
+
+```bash
 npm run dev
 ```
 
+To deploy on Vercel, add `REST_COUNTRIES_API_KEY` under **Settings → Environment Variables**.
+
 ## 📚 Data credits
 
-- Country data & flags: [mledoze/countries](https://github.com/mledoze/countries) (ODbL)
-- Population figures (≈2020 estimates): [apilayer/restcountries](https://github.com/apilayer/restcountries) (MPL-2.0)
+- Country data & flags: [REST Countries](https://restcountries.com/)
 
 ## 📂 Project structure
 
 ```
-public/
-  flags/               # 250 SVG flags
+api/
+  countries.js         # Serverless Function that calls REST Countries
 src/
-  data/countries.json  # Bundled country data (lazy-loaded)
-  useFetchData.js      # Custom hook: lazy-loads the data, loading / error states
+  useFetchData.js      # Custom hook: fetches the data, loading / error states
   pages/
     HomePage.jsx       # Search + region filter + country grid
     CountryPage.jsx    # Country details
@@ -60,6 +69,7 @@ src/
   components/
     CountryCard.jsx, CountryList.jsx, SearchInput.jsx, RegionMenu.jsx,
     ThemeSwitcher.jsx, Header.jsx, ShowMessage.jsx, EmptySearch.jsx
+vite.config.js         # Vite setup + local /api route for development
 vercel.json            # SPA rewrites for client-side routing
 ```
 
