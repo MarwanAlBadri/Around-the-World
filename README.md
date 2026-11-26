@@ -1,18 +1,69 @@
-# React + Vite
+# 🌍 Around the World
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A responsive React app to explore every country in the world — search by name, filter by region,
+and open a detail page for any country. Includes a light / dark theme.
 
-Currently, two official plugins are available:
+**🔗 Live demo:** <https://around-the-world-livid.vercel.app>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ✨ Features
 
-## React Compiler
+- Grid of all countries with flag, population, region and capital
+- Instant search by country name
+- Filter by region (Africa, Americas, Asia, Europe, Oceania)
+- Country detail page: population, region, sub-region, capital, top-level domain, currencies, languages
+- Client-side routing with React Router (`/` and `/:country`)
+- Light / dark mode switcher
+- Loading, error and "no results" states
+- Reusable components and a custom `useFetchData` hook
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+## 🛠 Tech stack
 
-Note: This will impact Vite dev & build performances.
+React 19 · Vite · Tailwind CSS v4 · React Router v7 · React Select · REST Countries API · Vercel Serverless Functions
 
-## Expanding the ESLint configuration
+## 🧠 How the data is loaded
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+The [REST Countries API](https://restcountries.com/) now redirects its `/v3.1/all` endpoint to a separate file host,
+which can break requests made directly from the browser. To keep the live site reliable, the app uses a serverless function:
+
+```
+Browser  ──►  /api/countries  (Vercel function, cached 24h)  ──►  restcountries.com
+```
+
+- `/api/countries` → all countries (only the fields the app needs)
+- `/api/countries?name=egypt` → a single country
+
+In development (`npm run dev`) the app calls REST Countries directly.
+
+## 🚀 Getting started
+
+```bash
+git clone https://github.com/MarwanAlBadri/Around-the-World.git
+cd Around-the-World
+npm install
+npm run dev
+```
+
+No API key is required.
+
+## 📂 Project structure
+
+```
+api/
+  countries.js         # Serverless function – fetches & caches country data
+src/
+  useFetchData.js      # Custom hook: loading / error / data
+  pages/
+    HomePage.jsx       # Search + region filter + country grid
+    CountryPage.jsx    # Country details
+    Layout.jsx, NoPage.jsx
+  components/
+    CountryCard.jsx, CountryList.jsx, SearchInput.jsx, RegionMenu.jsx,
+    ThemeSwitcher.jsx, Header.jsx, ShowMessage.jsx, EmptySearch.jsx
+vercel.json            # SPA rewrites (keeps /api routes working)
+```
+
+## 👤 Author
+
+**Marwan Al-Badri** — Junior Front-End Developer (React.js & TypeScript)
+
+- GitHub: [@MarwanAlBadri](https://github.com/MarwanAlBadri)
