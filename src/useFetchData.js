@@ -1,12 +1,18 @@
 import { useEffect, useState } from "react";
 
-// The app always talks to its own API route (/api/countries).
-// On Vercel it runs as a Serverless Function; during `npm run dev`
-// the same function is served by a small plugin in vite.config.js.
-function buildUrl(country) {
-  return country
-    ? `/api/countries?name=${encodeURIComponent(country)}`
-    : "/api/countries";
+// Country data is bundled with the app (src/data/countries.json) and the
+// flags are served from /public/flags, so the app needs no API key and
+// keeps working even if a third-party API changes or shuts down.
+// The JSON is loaded lazily, so it doesn't slow down the first page load.
+const loadCountries = () =>
+  import("./data/countries.json").then((module) => module.default);
+
+function findCountry(countries, name) {
+  const wanted = decodeURIComponent(name).toLowerCase();
+  return (
+    countries.find((c) => c.name.common.toLowerCase() === wanted) ||
+    countries.find((c) => c.name.official.toLowerCase() === wanted)
+  );
 }
 
 export default function useFetchData(country) {
@@ -20,18 +26,16 @@ export default function useFetchData(country) {
     setIsLoading(true);
     setIsError(false);
 
-    fetch(buildUrl(country))
-      .then((response) => {
-        if (!response.ok) throw new Error(`Request failed: ${response.status}`);
-        return response.json();
-      })
-      .then((data) => {
+    loadCountries()
+      .then((countries) => {
         if (ignore) return;
         if (country) {
-          setResult(data);
+          const match = findCountry(countries, country);
+          if (!match) throw new Error("Country not found");
+          setResult(match);
         } else {
-          setResult(data);
-          setFilteredCountries(data);
+          setResult(countries);
+          setFilteredCountries(countries);
         }
       })
       .catch(() => !ignore && setIsError(true))

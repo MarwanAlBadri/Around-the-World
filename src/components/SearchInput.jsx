@@ -2,7 +2,7 @@ export default function SearchInput({ countriesList, filterCountriesList }) {
   const onSubmitHandler = (e) => {
     e.preventDefault();
     const inputValue = e.target.elements.search.value;
-    const filteredCountries =!inputValue || inputValue === "" ?countriesList : countriesList.filter(country => country.name.official.toLowerCase().includes(inputValue.toLowerCase()))
+    const filteredCountries =!inputValue || inputValue === "" ?countriesList : countriesList.filter(country => [country.name.common, country.name.official].some(name => name.toLowerCase().includes(inputValue.toLowerCase())))
     filterCountriesList(filteredCountries);
   };
   return (

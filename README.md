@@ -8,7 +8,7 @@ and open a detail page for any country. Includes a light / dark theme.
 ## ✨ Features
 
 - Grid of all countries with flag, population, region and capital
-- Instant search by country name
+- Search by country name (common or official)
 - Filter by region (Africa, Americas, Asia, Europe, Oceania)
 - Country detail page: population, region, sub-region, capital, top-level domain, currencies, languages
 - Client-side routing with React Router (`/` and `/:country`)
@@ -18,24 +18,18 @@ and open a detail page for any country. Includes a light / dark theme.
 
 ## 🛠 Tech stack
 
-React 19 · Vite · Tailwind CSS v4 · React Router v7 · React Select · REST Countries API · Vercel Serverless Functions
+React 19 · Vite · Tailwind CSS v4 · React Router v7 · React Select · Static JSON data (lazy-loaded)
 
 ## 🧠 How the data is loaded
 
-The data comes from [REST Countries](https://restcountries.com/). Its old v1–v4 endpoints were shut down,
-and the new **v5 API requires an API key**, so the key must never be exposed in the browser.
-The app therefore uses a serverless function:
+The app used to call the [REST Countries](https://restcountries.com/) API, but its free v1–v4 endpoints were shut down
+and the new version requires a paid/registered API key. To keep the project **free, fast and reliable**, the data now ships with the app:
 
-```
-Browser  ──►  /api/countries  (Vercel function, holds RESTCOUNTRIES_API_KEY, cached 24h)  ──►  api.restcountries.com/countries/v5
-```
+- `src/data/countries.json` — 250 countries (names, native names, region, sub-region, capital, population, TLD, currencies, languages).
+  It is **lazy-loaded** with a dynamic `import()`, so it's split into its own chunk (~23 KB gzipped).
+- `public/flags/*.svg` — an SVG flag for every country, served as static files.
 
-- `/api/countries` → all countries
-- `/api/countries?name=egypt` → a single country
-
-The function also converts the v5 response into the simple shape the components use
-(`name`, `flags`, `population`, `region`, `capital`, `currencies`, `languages`, …).
-During `npm run dev`, a small Vite plugin serves the same function locally.
+No API key, no network dependency, no rate limits.
 
 ## 🚀 Getting started
 
@@ -43,25 +37,22 @@ During `npm run dev`, a small Vite plugin serves the same function locally.
 git clone https://github.com/MarwanAlBadri/Around-the-World.git
 cd Around-the-World
 npm install
-cp .env.example .env      # then add your REST Countries API key
 npm run dev
 ```
 
-Get a free key at <https://restcountries.com/sign-up>.
+## 📚 Data credits
 
-## ☁️ Deploying to Vercel
-
-1. Import the repo into Vercel (framework preset: **Vite**).
-2. In **Project → Settings → Environment Variables**, add `RESTCOUNTRIES_API_KEY`.
-3. Redeploy.
+- Country data & flags: [mledoze/countries](https://github.com/mledoze/countries) (ODbL)
+- Population figures (≈2020 estimates): [apilayer/restcountries](https://github.com/apilayer/restcountries) (MPL-2.0)
 
 ## 📂 Project structure
 
 ```
-api/
-  countries.js         # Serverless function – REST Countries v5, mapping & caching
+public/
+  flags/               # 250 SVG flags
 src/
-  useFetchData.js      # Custom hook: loading / error / data
+  data/countries.json  # Bundled country data (lazy-loaded)
+  useFetchData.js      # Custom hook: lazy-loads the data, loading / error states
   pages/
     HomePage.jsx       # Search + region filter + country grid
     CountryPage.jsx    # Country details
@@ -69,8 +60,7 @@ src/
   components/
     CountryCard.jsx, CountryList.jsx, SearchInput.jsx, RegionMenu.jsx,
     ThemeSwitcher.jsx, Header.jsx, ShowMessage.jsx, EmptySearch.jsx
-vite.config.js         # Includes a dev plugin that serves /api locally
-vercel.json            # SPA rewrites (keeps /api routes working)
+vercel.json            # SPA rewrites for client-side routing
 ```
 
 ## 👤 Author
