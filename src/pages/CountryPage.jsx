@@ -26,8 +26,8 @@ export default function CountryPage() {
               <g id="call-made">
                 <path
                   id="Shape"
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
+                  fillRule="evenodd"
+                  clipRule="evenodd"
                   d="M5.89267 3.53553L7.07118 4.71405L3.18209 8.60313L18.0313 8.60313L18.0313 10.253L3.18209 10.253L7.07118 14.1421L5.89267 15.3206L0.000111646 9.42809L5.89267 3.53553Z"
                   fill="#111827"
                 />
