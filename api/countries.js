@@ -52,7 +52,10 @@ export default async function handler(req, res) {
     const host = String(req.query.host || "restcountries.com");
     if (!/^([a-z0-9-]+\.)?restcountries\.com$/.test(host)) return res.status(400).end();
     const target = path.startsWith("/") ? `https://${host}${path}` : SOURCE;
-    const r = await fetch(target, { redirect: "follow" });
+    const r = await fetch(target, {
+      redirect: "follow",
+      headers: req.query.demo === "1" ? { Authorization: "Bearer rc_live_demo" } : {},
+    });
     let t = await r.text();
     if (req.query.strip === "1") {
       t = t.replace(/<(script|style|head)[\s\S]*?<\/\1>/g, " ").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
