@@ -22,17 +22,20 @@ React 19 · Vite · Tailwind CSS v4 · React Router v7 · React Select · REST C
 
 ## 🧠 How the data is loaded
 
-The [REST Countries API](https://restcountries.com/) now redirects its `/v3.1/all` endpoint to a separate file host,
-which can break requests made directly from the browser. To keep the live site reliable, the app uses a serverless function:
+The data comes from [REST Countries](https://restcountries.com/). Its old v1–v4 endpoints were shut down,
+and the new **v5 API requires an API key**, so the key must never be exposed in the browser.
+The app therefore uses a serverless function:
 
 ```
-Browser  ──►  /api/countries  (Vercel function, cached 24h)  ──►  restcountries.com
+Browser  ──►  /api/countries  (Vercel function, holds RESTCOUNTRIES_API_KEY, cached 24h)  ──►  api.restcountries.com/countries/v5
 ```
 
-- `/api/countries` → all countries (only the fields the app needs)
+- `/api/countries` → all countries
 - `/api/countries?name=egypt` → a single country
 
-In development (`npm run dev`) the app calls REST Countries directly.
+The function also converts the v5 response into the simple shape the components use
+(`name`, `flags`, `population`, `region`, `capital`, `currencies`, `languages`, …).
+During `npm run dev`, a small Vite plugin serves the same function locally.
 
 ## 🚀 Getting started
 
@@ -40,16 +43,23 @@ In development (`npm run dev`) the app calls REST Countries directly.
 git clone https://github.com/MarwanAlBadri/Around-the-World.git
 cd Around-the-World
 npm install
+cp .env.example .env      # then add your REST Countries API key
 npm run dev
 ```
 
-No API key is required.
+Get a free key at <https://restcountries.com/sign-up>.
+
+## ☁️ Deploying to Vercel
+
+1. Import the repo into Vercel (framework preset: **Vite**).
+2. In **Project → Settings → Environment Variables**, add `RESTCOUNTRIES_API_KEY`.
+3. Redeploy.
 
 ## 📂 Project structure
 
 ```
 api/
-  countries.js         # Serverless function – fetches & caches country data
+  countries.js         # Serverless function – REST Countries v5, mapping & caching
 src/
   useFetchData.js      # Custom hook: loading / error / data
   pages/
@@ -59,6 +69,7 @@ src/
   components/
     CountryCard.jsx, CountryList.jsx, SearchInput.jsx, RegionMenu.jsx,
     ThemeSwitcher.jsx, Header.jsx, ShowMessage.jsx, EmptySearch.jsx
+vite.config.js         # Includes a dev plugin that serves /api locally
 vercel.json            # SPA rewrites (keeps /api routes working)
 ```
 

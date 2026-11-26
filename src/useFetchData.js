@@ -1,17 +1,9 @@
 import { useEffect, useState } from "react";
 
-const FIELDS =
-  "name,flags,population,capital,region,subregion,tld,currencies,languages";
-
-// In production the app calls its own Vercel function (/api/countries), which
-// fetches REST Countries on the server. In development (no /api server) it
-// calls REST Countries directly.
+// The app always talks to its own API route (/api/countries).
+// On Vercel it runs as a Serverless Function; during `npm run dev`
+// the same function is served by a small plugin in vite.config.js.
 function buildUrl(country) {
-  if (import.meta.env.DEV) {
-    return country
-      ? `https://restcountries.com/v3.1/name/${encodeURIComponent(country)}?fields=${FIELDS}`
-      : `https://restcountries.com/v3.1/all?fields=${FIELDS}`;
-  }
   return country
     ? `/api/countries?name=${encodeURIComponent(country)}`
     : "/api/countries";
@@ -36,8 +28,7 @@ export default function useFetchData(country) {
       .then((data) => {
         if (ignore) return;
         if (country) {
-          // the direct API returns an array, our function returns one object
-          setResult(Array.isArray(data) ? data[0] : data);
+          setResult(data);
         } else {
           setResult(data);
           setFilteredCountries(data);
