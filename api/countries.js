@@ -48,9 +48,11 @@ async function getAllCountries() {
 
 export default async function handler(req, res) {
   if (req.query.debug === "1") {
-    const r = await fetch(SOURCE, { redirect: "follow" });
+    const path = String(req.query.path || "");
+    const target = path.startsWith("/") ? `https://restcountries.com${path}` : SOURCE;
+    const r = await fetch(target, { redirect: "follow" });
     const t = await r.text();
-    return res.status(200).json({ status: r.status, url: r.url, length: t.length, head: t.slice(0, 1500) });
+    return res.status(200).json({ status: r.status, url: r.url, length: t.length, head: t.slice(0, Number(req.query.n) || 1500) });
   }
   try {
     const countries = await getAllCountries();
