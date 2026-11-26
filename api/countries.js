@@ -47,6 +47,11 @@ async function getAllCountries() {
 }
 
 export default async function handler(req, res) {
+  if (req.query.debug === "1") {
+    const r = await fetch(SOURCE, { redirect: "follow" });
+    const t = await r.text();
+    return res.status(200).json({ status: r.status, url: r.url, length: t.length, head: t.slice(0, 1500) });
+  }
   try {
     const countries = await getAllCountries();
     res.setHeader("Cache-Control", "s-maxage=86400, stale-while-revalidate=604800");
