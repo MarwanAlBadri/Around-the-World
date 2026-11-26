@@ -1,29 +1,40 @@
 import { useEffect, useState } from "react";
 
+// The app calls its own API route (/api/countries), which holds the API key.
+// On Vercel it runs as a Serverless Function; during `npm run dev`
+// the same function is served by a small plugin in vite.config.js.
 export default function useFetchData(country) {
   const [result, setResult] = useState([]);
   const [filteredCountries, setFilteredCountries] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   useEffect(() => {
-    let url =
-      "https://restcountries.com/v3.1/all?fields=name,flags,population,capital,region";
+    let ignore = false;
+    const url = country
+      ? `/api/countries?name=${encodeURIComponent(country)}`
+      : "/api/countries";
     setIsLoading(true);
-    if (country) {
-      url = `https://restcountries.com/v3.1/name/${country}?fields=name,flags,population,capital,region,subregion,tld,currencies,languages`;
-    }
+    setIsError(false);
     fetch(url)
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Request failed: ${response.status}`);
+        }
+        return response.json();
+      })
       .then((data) => {
-        if (country) {
-          setResult(data[0]);
-        } else {
-          setResult(data);
+        if (ignore) return;
+        setResult(data);
+        if (!country) {
           setFilteredCountries(data);
         }
       })
-      .catch(() => setIsError(true))
-      .finally(() => setIsLoading(false));
+      .catch(() => !ignore && setIsError(true))
+      .finally(() => !ignore && setIsLoading(false));
+
+    return () => {
+      ignore = true;
+    };
   }, [country]);
 
   return {
