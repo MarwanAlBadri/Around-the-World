@@ -57,6 +57,9 @@ export default async function handler(req, res) {
     if (req.query.strip === "1") {
       t = t.replace(/<(script|style|head)[\s\S]*?<\/\1>/g, " ").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
     }
+    if (req.query.links === "1") {
+      t = [...new Set([...t.matchAll(/href="([^"]+)"/g)].map((m) => m[1]))].filter((h) => h.includes("docs")).join("\n");
+    }
     const from = Number(req.query.from) || 0;
     t = t.slice(from);
     return res.status(200).json({ status: r.status, url: r.url, length: t.length, head: t.slice(0, Number(req.query.n) || 1500) });
