@@ -8,14 +8,38 @@ const FIELDS = [
 ];
 const SOURCE = `https://restcountries.com/v3.1/all?fields=${FIELDS.join(",")}`;
 
-let cache = null; // reused while the function instance stays warm
+let cache = null;
+
+// The response may be a plain array, or wrapped in an object
+// (e.g. { countries: [...] } or { "EG": {...}, ... }).
+function toArray(parsed) {
+  if (Array.isArray(parsed)) return parsed;
+  if (parsed && typeof parsed === "object") {
+    const firstArray = Object.values(parsed).find(Array.isArray);
+    if (firstArray) return firstArray;
+    const values = Object.values(parsed);
+    if (values.length && values.every((v) => v && typeof v === "object" && v.name)) {
+      return values;
+    }
+  }
+  return null;
+} // reused while the function instance stays warm
 
 async function getAllCountries() {
   if (cache) return cache;
   const response = await fetch(SOURCE, { redirect: "follow" });
   if (!response.ok) throw new Error(`REST Countries responded ${response.status}`);
-  const data = await response.json();
-  if (!Array.isArray(data)) throw new Error("Unexpected REST Countries response");
+  const text = await response.text();
+  let parsed;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    throw new Error(`REST Countries returned non-JSON: ${text.slice(0, 120)}`);
+  }
+  const data = toArray(parsed);
+  if (!data) {
+    throw new Error(`Unexpected REST Countries response: ${text.slice(0, 120)}`);
+  }
   cache = data.map((c) =>
     Object.fromEntries(FIELDS.map((f) => [f, c[f]]))
   );
